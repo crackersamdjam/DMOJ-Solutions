@@ -1,40 +1,36 @@
-// https://dmoj.ca/problem/ds4
 #include <bits/stdc++.h>
+#define size(x) (x).begin(), (x).end()
+
 using namespace std;
 using ll = long long;
 const int MM = 6e5+5;
 
-//mt19937_64 g(chrono::steady_clock::now().time_since_epoch().count());
-//mt19937_64 g((uint64_t) new char);
 mt19937_64 g(0);
-int randint(int l, int r){return uniform_int_distribution<int>(l, r)(g);}
-ll randll(ll l, ll r){return uniform_int_distribution<ll>(l, r)(g);}
-
-#define lc T[x].l
-#define rc T[x].r
 
 struct node{
+	int key = 0, sz = 0, l = 0, r = 0;
 	ll pr = g();
-	int l = 0, r = 0, key = 0, sz = 0;
-	// here val == key
-} T[MM];
+} t[MM];
+
+#define lc t[x].l
+#define rc t[x].r
 
 int ptr;
 
-int next(int val){
-	T[++ptr].key = val;
+int next(int v){
+	t[++ptr].key = v;
 	return ptr;
 }
 
 void pull(int x){
 	if(!x) return;
-	T[x].sz = 1+T[lc].sz+T[rc].sz;
+	t[x].sz = t[lc].sz + t[rc].sz + 1;
 }
 
-// >= key
+// >= key -> rs
 void split(int x, int key, int &l, int &r){
 	if(!x) l = r = 0;
-	else if(T[x].key >= key){
+	else if(t[x].key >= key){
 		split(lc, key, l, lc);
 		r = x;
 	}
@@ -47,80 +43,87 @@ void split(int x, int key, int &l, int &r){
 
 void merge(int &x, int l, int r){
 	if(!l or !r)
-		x = l?l:r;
-	else if(T[l].pr > T[r].pr){
-		merge(T[l].r, T[l].r, r);
+		x = l ? l : r;
+	else if(t[l].pr > t[r].pr){
+		merge(t[l].r, t[l].r, r);
 		x = l;
 	}
 	else{
-		merge(T[r].l, l, T[r].l);
+		merge(t[r].l, l, t[r].l);
 		x = r;
 	}
 	pull(x);
 }
 
 int kth(int x, int k){
-	if(k < T[lc].sz)
+	if(k < t[lc].sz)
 		return kth(lc, k);
-	k -= T[lc].sz;
-	if(!k)
-		return T[x].key;
+	k -= t[lc].sz;
+	
+	if(!k) return t[x].key;
 	k--;
 	return kth(rc, k);
 }
 
-int ord(int x, int k, int i=1){
+int ord(int x, int k, int i = 1){
 	if(!x) return 1e9;
-	if(T[x].key < k)
-		return ord(rc, k, i+T[lc].sz+1);
-	int cur = T[x].key == k ? T[lc].sz+i : 1e9;
-	return min(cur, ord(lc, k, i));
+	if(t[x].key < k)
+		return ord(rc, k, i+t[lc].sz+1);
+
+	int ret = ord(lc, k, i);
+	if(t[x].key == k)
+		ret = min(ret, t[lc].sz+i);
+	return ret;
 }
 
 void out(int x){
 	if(!x) return;
 	out(lc);
-	cout<<T[x].key<<' ';
+	cout<<t[x].key<<' ';
 	out(rc);
 }
 
-int n, m, last, rt, ls, rs;
-
 int main(){
-	ios_base::sync_with_stdio(0); cin.tie(0); cout.tie(0);
-	cin>>n>>m;
+	ios_base::sync_with_stdio(0);
+	cin.tie(0);
+	cin.exceptions(cin.failbit);
+	
+	int n, q;
+	cin>>n>>q;
+	int rt = 0, t1, t2, last = 0;
+
 	while(n--){
-		int v;
-		cin>>v;
-		split(rt, v, rt, rs);
-		merge(rt, rt, next(v));
-		merge(rt, rt, rs);
+		int x; cin>>x;
+		split(rt, x, rt, t1);
+		merge(rt, rt, next(x));
+		merge(rt, rt, t1);
 	}
-	char op; int v;
-	while(m--){
-		cin>>op>>v;
-		v ^= last;
-		if(op == 'I'){
-			split(rt, v, rt, rs);
-			merge(rt, rt, next(v));
-			merge(rt, rt, rs);
+
+	while(q--){
+		char c; int x;
+		cin>>c>>x;
+		x ^= last;
+		if(c == 'I'){
+			split(rt, x, rt, t1);
+			merge(rt, rt, next(x));
+			merge(rt, rt, t1);
 		}
-		if(op == 'R'){
-			split(rt, v+1, rt, rs);
-			split(rt, v, rt, ls);
-			merge(ls, T[ls].l, T[ls].r);
-			merge(rt, rt, ls);
-			merge(rt, rt, rs);
+		else if(c == 'R'){
+			split(rt, x+1, rt, t1);
+			split(rt, x, rt, t2);
+			merge(t2, t[t2].l, t[t2].r);
+			merge(rt, rt, t2);
+			merge(rt, rt, t1);
 		}
-		if(op == 'S'){
-			cout<<(last=kth(rt, v-1))<<'\n';
+		else if(c == 'S'){
+			cout<<(last=kth(rt, x-1))<<'\n';
 		}
-		if(op == 'L'){
-			int r = ord(rt, v);
-			if(r >= 1e9)
-				r = -1;
-			cout<<(last=r)<<'\n';;
+		else if(c == 'L'){
+			int v = ord(rt, x);
+			if(v >= 1e9) v = -1;
+			cout<<(last=v)<<'\n';
 		}
+		else abort();
 	}
 	out(rt);
 }

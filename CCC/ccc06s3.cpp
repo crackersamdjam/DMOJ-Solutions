@@ -1,92 +1,62 @@
+#pragma once
 #include <bits/stdc++.h>
-#define gc getchar_unlocked()
-#define pc(x) putchar_unlocked(x)
-template<typename T> void scan(T &x) {x = 0;register bool _=0;register T c=gc;_=c==45;c=_?gc:c;while(c<48||c>57)c=gc;for(;c<48||c>57;c=gc);for(;c>47&&c<58;c=gc)x=(x<<3)+(x<<1)+(c&15);x=_?-x:x;}
-template<typename T> void print(T n) {register bool _=0;_=n<0;n=_?-n:n;char snum[65];int i=0;do{snum[i++]=n%10+48;n/= 10;}while(n);--i;if (_)pc(45);while(i>=0)pc(snum[i--]);pc(10);}
-template<typename T> void printmn(T n) {register bool _=0;_=n<0;n=_?-n:n;char snum[65];int i=0;do{snum[i++]=n%10+48;n/= 10;}while(n);--i;if (_)pc(45);while(i>=0)pc(snum[i--]);}
-template<typename First, typename ... Ints>
-void scan(First &arg, Ints&... rest) {scan(arg);scan(rest...);}
-template<typename First, typename ... Ints>
-void printm(First arg, Ints... rest) {printmn(arg);pc(32);printmn(rest...);pc(10);}
-
 using namespace std;
 
-int N, ans;
+//using T = double; constexpr T eps = 1e-7;
+using T = int; constexpr T eps = 0;
+using pt = complex<T>;
+#define x real()
+#define y imag()
 
-struct point{
-    double x, y;
-} arr[35];
+bool operator<(const pt &a, const pt &b){
+	return a.x < b.x or (abs(a.x-b.x) <= eps and a.y < b.y-eps);}
+bool operator==(const pt &a, const pt &b){
+	return abs(a.x-b.x) <= eps and abs(a.y-b.y) <= eps;}
+bool operator<=(const pt &a, const pt &b){
+	return a < b or a == b;}
 
-struct line{
-    double a, b, c, d;
-} l;
+T dot(pt a, pt b){ return a.x*b.x + a.y*b.y;}
+T norm(pt a){ return dot(a, a); } //norm is distance squared
+T cross(pt a, pt b){ return a.x*b.y - a.y*b.x;}
+T cross(pt origin, pt a, pt b){ return cross(a-origin, b-origin);}
 
-bool intersect(line a, line b){
-    double ma = (a.c == a.a)?1e5:((a.d-a.b)/(a.c-a.a));
-    double mb = (b.c == b.a)?1e5:((b.d-b.b)/(b.c-b.a));
-    double ba = -ma*a.a + a.b;
-    double bb = -mb*b.a + b.b;
-    //cout << "ma " << ma << " mb " << mb << "\n";
-    if(abs(ma - mb) < 0.001){
-        //same slope
-        if(abs(ba - bb) < 0.001){
-            //same x-int
-            return ((b.c - a.a >= -0.001) && (a.c - b.a >= -0.001));
-        }
-        return 0;
-    }
-    double x = (bb - ba)/(ma - mb);
-    double y = ma*x + ba;
-    
-    //test whether x is in range of each line
-    //test y as well
-    
-    if((x - a.a >= -0.001) && (a.c - x >= -0.001) && (y - a.b >= -0.001) && (a.d-y >= -0.001)){
-        if((x - b.a >= -0.001) && (b.c - x >= -0.001) && (y - b.b >= -0.001) && (b.d-y >= -0.001)){
-            return 1;
-        }
-    }
-    
-    return 0;
+pt intersect(pt a1, pt a2, pt b1, pt b2){
+	// lines a1-a2 and b1-b2
+	pt d1 = a2-a1, d2 = b2-b1;
+	return a1 + cross(b1-a1, d2)/cross(d1, d2) * d1;
+}
+bool has_intersect(pt a1, pt a2, pt b1, pt b2){
+	if(max(a1.x, a2.x) >= min(b1.x, b2.x) && max(b1.x, b2.x) >= min(a1.x, a2.x) &&
+		max(a1.y, a2.y) >= min(b1.y, b2.y) && max(b1.y, b2.y) >= min(a1.y, a2.y)
+		&& cross(a1, a2, b1) * cross(a1, a2, b2) <= 0
+		&& cross(b1, b2, a1) * cross(b1, b2, a2) <= 0)
+		return 1;
+	return 0;
 }
 
+istream &operator >> (istream &stream, pt &p){
+	T X, Y; stream>>X>>Y; p = pt(X, Y); return stream;}
+ostream &operator << (ostream &stream, const pt &p){
+	return stream<<p.x<<' '<<p.y;}
+
+// bruce code https://dmoj.ca/src/2941660
+int a,b,c,d, n;
 int main(){
-    
-    cin.sync_with_stdio(0);
-    cin.tie(0);
-    
-    cin >> l.a >> l.b >> l.c >> l.d;
-    if(l.a > l.c)
-        swap(l.a, l.c);
-    if(l.b > l.d)
-        swap(l.b, l.d);
-    
-    cin >> N;
-    
-    for(int i = 0,n; i < N; i++){
-        cin >> n;
-        for(int j = 0; j < n; j++)
-            cin >> arr[j].x >> arr[j].y;
-        
-        arr[n] = arr[0];
-        
-        for(int j = 0; j < n; j++){
-            line ln = {arr[j].x, arr[j].y, arr[j+1].x, arr[j+1].y};
-            
-            if(ln.a > ln.c)
-                swap(ln.a, ln.c);
-            
-            if(ln.b > ln.d)
-                swap(ln.b, ln.d);
-            
-            if(intersect(l, ln)){
-                ans++;
-                break;
-            }
-        }
-    }
-    
-    cout << ans << '\n';
-    
-    return 0;
+	cin >> a >> b >> c >> d;
+	pt start={a,b}, finish={c,d};
+	cin >> n;
+	int ans = 0;
+	for(int i = 0; i < n; i++){
+		int corners; cin >> corners;
+		vector<pt> pt(corners);
+		for(int j=0,xx,yy; j<corners; j++){
+			cin>>pt[j];
+		}
+		for(int j = 0; j < corners; j++){
+			if(has_intersect(start, finish, pt[j], pt[(j+1)%corners])){
+				ans++; break;
+			}
+		}
+	}
+	cout << ans << '\n';
 }

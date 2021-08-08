@@ -1,3 +1,9 @@
+#ifndef LOCAL
+#pragma GCC optimize("O3","unroll-loops","omit-frame-pointer","inline")
+#pragma GCC option("arch=native","tune=native","no-zero-upper")
+#pragma GCC target("avx2")
+#endif
+
 #include <bits/stdc++.h>
 #define all(x) (x).begin(), (x).end()
 #define gc getchar()
@@ -35,7 +41,7 @@ long long min_distance(vector<int> x, vector<int> h, vector<int> l, vector<int> 
 		int id = mp[{i, j}];
 		if(id) return;
 		id = mp[{i, j}] = ++ptr;
-		assert(ptr < NN);
+		// assert(ptr < NN);
 		
 		incol[i].emplace_back((~j) ? y[j] : 0, ptr);
 		if(~j) inrow[j].emplace_back(x[i], ptr);
@@ -185,21 +191,20 @@ long long min_distance(vector<int> x, vector<int> h, vector<int> l, vector<int> 
 
 #ifndef ONLINE_JUDGE
 int main(){
-	string Z;
-	cin>>Z;
-	int N, M, ST, ED;
-	scan(N, M);
-	vector<int> X(N), H(N), L(M), R(M), Y(M);
-	for(int i = 0; i < N; i++){
-		scan(X[i], H[i]);
-	}
-	for(int i = 0; i < M; i++){
-		scan(L[i], R[i], Y[i]);
-	}
-	scan(ST, ED);
-	print(min_distance(X, H, L, R, Y, ST, ED));
-
-	return 0;
+	// string Z;
+	// cin>>Z;
+	// int N, M, ST, ED;
+	// scan(N, M);
+	// vector<int> X(N), H(N), L(M), R(M), Y(M);
+	// for(int i = 0; i < N; i++){
+	// 	scan(X[i], H[i]);
+	// }
+	// for(int i = 0; i < M; i++){
+	// 	scan(L[i], R[i], Y[i]);
+	// }
+	// scan(ST, ED);
+	// print(min_distance(X, H, L, R, Y, ST, ED));
+	// return 0;
 
 	if(1){
 		print(min_distance({0, 3, 5, 7, 10, 12, 14},

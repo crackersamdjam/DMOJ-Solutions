@@ -1,58 +1,57 @@
+// https://dmoj.ca/problem/hci16police
 #include <bits/stdc++.h>
-#define gc getchar_unlocked()
-#define pc(x) putchar_unlocked(x)
-template<typename T> void scan(T &x){x = 0;register bool _=0;register T c=gc;_=c==45;c=_?gc:c;while(c<48||c>57)c=gc;for(;c<48||c>57;c=gc);for(;c>47&&c<58;c=gc)x=(x<<3)+(x<<1)+(c&15);x=_?-x:x;}
-template<typename T> void printn(T n){register bool _=0;_=n<0;n=_?-n:n;char snum[65];int i=0;do{snum[i++]=n%10+48;n/= 10;}while(n);--i;if (_)pc(45);while(i>=0)pc(snum[i--]);}
-template<typename First, typename ... Ints> void scan(First &arg, Ints&... rest){scan(arg);scan(rest...);}
-template<typename T> void print(T n){printn(n);pc(10);}
-template<typename First, typename ... Ints> void print(First arg, Ints... rest){printn(arg);pc(32);print(rest...);}
-
+#define MX 200000
+#define ll long long
+#define ldb long double
 using namespace std;
-typedef long long ll;
-const int M = 1e5+2;
 
-int n, h;
-ll a[M], dp[M];
-deque<int> q;
-
-#define sq(x) (x)*(x)
-
-double thing(int j, int k){
-    j++, k++;
-    return (dp[k-1] - dp[j-1] + sq(a[k]) - sq(a[j]))/(2.0*(a[k] - a[j]));
-}
-
-int main(){
-    
-    scan(n, h);
-    
-    memset(dp, 0x3f, sizeof dp);
-    dp[0] = 0;
-    q.push_back(0);
-    
-    for(int i = 1; i <= n; i++)
-        scan(a[i]);
-    
-    for(int i = 1; i <= n; i++){
-        
-        while(q.size() > 1 && thing(q[0], q[1]) <= a[i])
-            q.pop_front();
-        
-        dp[i] = dp[q[0]] + sq(a[i] - a[q[0]+1]) + h;
-        
-        while(q.size() > 1 && thing(q[q.size()-2], q.back()) > thing(q.back(), i))
-            q.pop_back();
-        
-        q.push_back(i);
+struct Line {
+    ll m, b;
+    Line (ll _m = 0, ll _b = 0) : m(_m), b(_b) {}
+    ll eval(ll x) {
+        return m * x + b;
     }
-    
-    print(dp[n]);
-    
+    // Intersection of X coordinates
+    ldb intersect(Line l) {
+        return (ldb) (b - l.b) / (l.m - m);
+    }
+};
+
+int N;
+ll H;
+ll loc[MX + 1], dp[MX + 1];
+deque<Line> dq;
+ll ans = 0;
+
+// dp[i] = loc[i]^2 + H + min(-2 * {loc[i]} * loc[j] + loc[j]^2 + dp[j - 1])
+// slope: -2 * loc[j]
+
+int main() {
+    cin >> N >> H;
+
+    for (int i = 1; i <= N; i++)
+        cin >> loc[i];
+
+    sort(loc + 1, loc + 1 + N);
+
+    for (int i = 1; i <= N; i++) {
+        ll curX = loc[i];
+
+        Line cur = Line(-2 * loc[i], loc[i] * loc[i] + dp[i - 1]);
+
+        while (dq.size() >= 2 && cur.intersect(dq[0]) <= dq[0].intersect(dq[1]))
+            dq.pop_front();
+        dq.push_front(cur);
+
+        while (dq.size() >= 2 && dq.back().eval(curX) > dq[dq.size() - 2].eval(curX))
+            dq.pop_back();
+        
+        dp[i] = dq.back().eval(curX) + loc[i] * loc[i] + H;
+    }
+
+    // for (int i = 1; i <= N; i++)   
+    //     cout << dp[i] << " "; cout << endl;
+
+    cout << dp[N] << "\n";
     return 0;
 }
-/*
- dp[j-1] + (a_i-a_j)^2 <= dp[k-1] + (a_i-a_k)^2; j < k
- dp[j-1] + a_i^2 - 2a_ia_j + a_j^2 <= dp[k-1] + a_i^2 - 2a_ia_k + a_k^2
- 2a_ia_k - 2a_ia_j <= dp[k-1] - dp[j-1] + a_k^2 - a_j^2
- a_i <= (dp[k-1] - dp[j-1] + a_k^2 - a_j^2)/(2(a_k - a_j)
- */

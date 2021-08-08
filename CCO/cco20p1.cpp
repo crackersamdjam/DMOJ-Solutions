@@ -1,47 +1,40 @@
 #include <bits/stdc++.h>
+#define all(x) (x).begin(), (x).end()
+
 using namespace std;
-using ld = long double;
+using ld = double;
 using ll = long long;
-const int MM = 1e5+5;
+constexpr int MM = 1e5+5;
 
 map<ll, int> mp;
 int n, psa[MM];
 ll l, r, y;
 
 int main(){
-    ios_base::sync_with_stdio(0);
-    cin.tie(0);
+	ios_base::sync_with_stdio(0);
+	cin.tie(0);
+	cin.exceptions(cin.failbit);
+	
     cin>>n>>l>>r>>y;
     mp[l] = mp[r+1] = 0;
     
     for(int i = 0; i < n; i++){
         ll x, v, h;
-        cin>>x>>v>>h;
-        swap(v, h);
-//        cout<<"pt "<<x<<' '<<v<<' '<<h<<endl;
+        cin>>x>>h>>v;
         
-        //rs
         ll xx = ceil((ld)v*y/h + x);
-        xx = max(xx, l);
-        if(xx <= r){
-            mp[xx]--;
-        }
+        mp[max(xx, l)]--;
         
-        //ls
-        xx = floor((ld)v*-y/h + x + 1);
-        
-        xx = max(xx, l);
-        if(xx <= r){
-            mp[xx]++;
-        }
+        xx = floor((ld)v*-y/h + x) + 1;
+        mp[max(xx, l)]++;
     }
     ll last = l, cnt = 0;
-    for(auto i: mp){
-//        cout<<last<<' '<<i.first<<' '<<cnt<<endl;
-        ll d = i.first-last;
-        last = i.first;
+    for(auto [i, v]: mp){
+        ll d = i-last;
+        last = i;
         psa[cnt] += d;
-        cnt += i.second;
+        cnt += v;
+        if(i == r+1) break;
     }
     cout<<psa[0]<<'\n';
     for(int i = 1; i <= n; i++){
@@ -49,16 +42,3 @@ int main(){
         cout<<psa[i]<<'\n';
     }
 }
-/*
-
-3
--7 7 3
-0 2 3
--4 2 1
-3 3 1
-
-1
--2 2 3
-0 2 3
- 
- */

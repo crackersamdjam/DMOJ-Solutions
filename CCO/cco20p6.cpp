@@ -1,16 +1,16 @@
 #include <bits/stdc++.h>
 #define all(x) (x).begin(), (x).end()
-#define gc getchar()
-#define pc(x) putchar(x)
-template<typename T> void scan(T &x){x = 0;bool _=0;T c=gc;_=c==45;c=_?gc:c;while(c<48||c>57)c=gc;for(;c<48||c>57;c=gc);for(;c>47&&c<58;c=gc)x=(x<<3)+(x<<1)+(c&15);x=_?-x:x;}
-template<typename T> void printn(T n){bool _=0;_=n<0;n=_?-n:n;char snum[65];int i=0;do{snum[i++]=n%10+48;n/= 10;}while(n);--i;if (_)pc(45);while(i>=0)pc(snum[i--]);}
-template<typename First, typename ... Ints> void scan(First &arg, Ints&... rest){scan(arg);scan(rest...);}
-template<typename T> void print(T n){printn(n);pc(10);}
-template<typename First, typename ... Ints> void print(First arg, Ints... rest){printn(arg);pc(32);print(rest...);}
+
+#ifdef LOCAL
+template<typename T> void pr(T a){std::cerr<<a<<std::endl;}
+template<typename T, typename... Args> void pr(T a, Args... args){std::cerr<<a<<' ',pr(args...);}
+#else
+template<typename... Args> void pr(Args... args){}
+#endif
 
 using namespace std;
 using ll = long long;
-const int MM = 2e5+5;
+constexpr int MM = 2e5+5;
 
 int n, m, k, x[MM], y[MM];
 vector<int> in[MM];
@@ -24,7 +24,7 @@ int maxx(int i){
 	return y[b[i].first];
 }
 int nor(int i){
-	return (int)a[i].size();
+	return (int)size(a[i]);
 }
 
 inline bool cmp(const pair<int, vector<int>> &va, const pair<int, vector<int>> &vb){
@@ -32,8 +32,7 @@ inline bool cmp(const pair<int, vector<int>> &va, const pair<int, vector<int>> &
 }
 
 struct state{
-	ll v;
-	int i, j, cnt, maxr; //can not go past next at maxr
+	ll v; int i, j, cnt, maxr; //can not go past next at maxr
 	bool operator<(const state &o) const{
 		return v > o.v;
 	}
@@ -43,53 +42,54 @@ priority_queue<state> q;
 ll base;
 
 int main(){
-	scan(n, m, k);
+	ios_base::sync_with_stdio(0);
+	cin.tie(0);
+	cin.exceptions(cin.failbit);
+	
+	cin>>n>>m>>k;
 	for(int i = 0,d,c; i < n; i++){
-		scan(d, c);
+		cin>>d>>c;
 		in[d-1].emplace_back(c);
 	}
 	for(int i = 0; i < m; i++){
-		scan(x[i], y[i]);
+		cin>>x[i]>>y[i];
 		sort(all(in[i]));
-		if((int)in[i].size() < x[i]){
+		if((int)size(in[i]) < x[i]){
 			while(k--)
-				print(-1);
+				cout<<"-1\n";
 			return 0;
 		}
 		for(int j = 0; j < x[i]; j++){
 			base += in[i][j];
 		}
-		for(int j = (int)in[i].size()-1; j > 0; j--){
+		for(int j = (int)size(in[i])-1; j > 0; j--){
 			in[i][j] -= in[i][j-1];
 		}
 		
-		if((int)in[i].size() > x[i] and y[i]){
+		if((int)size(in[i]) > x[i] and y[i]){
 			a.emplace_back(in[i]);
 			b.emplace_back(i, in[i]);
 		}
 	}
 	sort(all(b), cmp);
-	for(int i = 0; i < (int)a.size(); i++)
+	for(int i = 0; i < (int)size(a); i++)
 		a[i] = b[i].second;
 	
-	if(b.empty()){
-		print(base);
+	if(!size(b)){
+		cout<<base<<'\n';
 		k--;
 		while(k--)
-			print(-1);
+			cout<<"-1\n";
 		return 0;
 	}
-	m = a.size();
+
+	m = (int)size(a);
 	q.push({base, 0, minn(0)-1, 0, nor(0)}); //cnt is how many on right moved...
-	while(q.size()){
-		auto cur = q.top(); q.pop();
-		ll curd = cur.v;
-		int i = cur.i, j = cur.j, cnt = cur.cnt, maxr = cur.maxr;
-		k--;
-		print(curd);
-		// print(curd, i, j, cnt, maxr);
-		if(!k)
-			return 0;
+	while(size(q)){
+		auto [curd, i, j, cnt, maxr] = q.top(); q.pop();
+		cout<<curd<<'\n';
+		if(!--k) return 0;
+
 		if(j+1 < maxr){
 			q.push({curd+a[i][j+1], i, j+1, cnt+!cnt, maxr}); //edge case !cnt
 		}
@@ -114,5 +114,5 @@ int main(){
 		}
 	}
 	while(k--)
-		print(-1);
+		cout<<"-1\n";
 }

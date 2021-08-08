@@ -90,7 +90,10 @@ int main(){
 	for(int i = 1; i <= n; i++){
 		ll tmp;
 		cin>>s[i]>>tmp;
-		q.emplace_back(i); //current one gets updated
+		//q.emplace_back(i); //current one gets updated
+		//idk what this line was doing here
+		   ST.update(i, i, tmp); //???
+		
 		while(size(q) > 1 and a[q.back()] <= tmp){
 			int r = q.back(); q.pop_back();
 			ll dif = tmp-a[r];

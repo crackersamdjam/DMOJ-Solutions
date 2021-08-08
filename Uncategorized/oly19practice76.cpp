@@ -1,53 +1,43 @@
 #include <bits/stdc++.h>
-#define gc getchar_unlocked()
-#define pc(x) putchar_unlocked(x)
-template<typename T> void scan(T &x){x = 0;bool _=0;T c=gc;_=c==45;c=_?gc:c;while(c<48||c>57)c=gc;for(;c<48||c>57;c=gc);for(;c>47&&c<58;c=gc)x=(x<<3)+(x<<1)+(c&15);x=_?-x:x;}
-template<typename T> void printn(T n){bool _=0;_=n<0;n=_?-n:n;char snum[65];int i=0;do{snum[i++]=n%10+48;n/= 10;}while(n);--i;if (_)pc(45);while(i>=0)pc(snum[i--]);}
-template<typename First, typename ... Ints> void scan(First &arg, Ints&... rest){scan(arg);scan(rest...);}
-template<typename T> void print(T n){printn(n);pc(10);}
-template<typename First, typename ... Ints> void print(First arg, Ints... rest){printn(arg);pc(32);print(rest...);}
+#define all(x) (x).begin(), (x).end()
 
-void init(){
-    #ifndef ONLINE_JUDGE
-    freopen("in.txt", "r", stdin);
-    freopen("out.txt", "w", stdout);
-    freopen("err.txt", "w", stderr);
-    #endif
-}
+#ifdef LOCAL
+template<typename T> void pr(T a){std::cerr<<a<<std::endl;}
+template<typename T, typename... Args> void pr(T a, Args... args){std::cerr<<a<<' ',pr(args...);}
+#else
+template<typename... Args> void pr(Args... args){}
+#endif
 
 using namespace std;
-const int MM = 2001;
+const int MM = 2005;
 
-int n, a[20], sum, ans = 1e9;
-bool dp[MM][MM];
+int n, sum, ans = 1e9;
+int dp[MM][MM];
 
 int main(){
-    init();
-    scan(n);
-    dp[0][0] = 1;
-    for(int i = 0; i < n; i++){
-        scan(a[i]);
-        sum += a[i];
-        for(int j = MM-1; j >= 0; j--){
-            for(int k = MM-1; k >= 0; k--){
-                if(j >= a[i])
-                    dp[j][k] |= dp[j-a[i]][k];
-                if(k >= a[i])
-                    dp[j][k] |= dp[j][k-a[i]];
-            }
-        }
-    }
-
-    for(int j = 0; j < MM; j++){
-        for(int k = 0; k < MM; k++){
-            if(dp[j][k]){
-                int r = sum-j-k;
-                ans = min(ans, max(j, max(k, r)));
-            }
-        }
-    }
-
-    print(ans);
-    
-    return 0;
+	ios_base::sync_with_stdio(0);
+	cin.tie(0);
+	cin.exceptions(cin.failbit);
+	
+	cin>>n;
+	dp[0][0] = 1;
+	while(n--){
+		int a;
+		cin>>a;
+		sum += a;
+		for(int i = MM-1; i >= 0; i--){
+			for(int j = MM-1; j >= 0; j--){
+				if(i >= a) dp[i][j] |= dp[i-a][j];
+				if(j >= a) dp[i][j] |= dp[i][j-a];
+			}
+		}
+	}
+	for(int i = 0; i < MM; i++){
+		for(int j = 0; j < MM; j++){
+			if(dp[i][j])
+				ans = min(ans, max({i, j, sum-i-j}));
+		}
+	}
+	cout<<ans<<'\n';
 }
+// what a bait

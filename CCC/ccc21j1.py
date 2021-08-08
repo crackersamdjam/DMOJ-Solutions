@@ -1,3 +1,11 @@
-v = 5*int(input())-400
-print(v)
-print(-1 if v > 100 else 1 if v < 100 else 0)
+b = int(input())
+p = 5*b-400
+
+print(p)
+
+if p > 100:
+	print(-1)
+elif p == 100:
+	print(0)
+else:
+	print(1)
