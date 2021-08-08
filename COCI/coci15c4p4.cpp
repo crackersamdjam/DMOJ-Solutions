@@ -1,0 +1,51 @@
+#include <bits/stdc++.h>
+#define gc getchar_unlocked()
+#define pc(x) putchar_unlocked(x)
+template<typename T> void scan(T &x) {x = 0;register bool _=0;register T c=gc;_=c==45;c=_?gc:c;while(c<48||c>57)c=gc;for(;c<48||c>57;c=gc);for(;c>47&&c<58;c=gc)x=(x<<3)+(x<<1)+(c&15);x=_?-x:x;}
+template<typename T> void print(T n) {register bool _=0;_=n<0;n=_?-n:n;char snum[65];int i=0;do{snum[i++]=n%10+48;n/= 10;}while(n);--i;if (_)pc(45);while(i>=0)pc(snum[i--]);pc(10);}
+template<typename First, typename ... Ints>
+void scan(First &arg, Ints&... rest) {scan(arg);scan(rest...);}
+
+using namespace std;
+typedef long long ll;
+
+ll N, K, Q;
+
+int main(){
+    
+    scan(N, K, Q);
+    
+    for(int i = 0; i < Q; i++){
+        ll a, b, ans = 0;
+        scan(a, b);
+        
+        if(K == 1){
+            print(abs(a-b));
+            continue;
+        }
+        
+        while(a != b){
+            //printf("%lld %lld\n", a, b);
+            if(a > b){
+                ans++;
+                a = (a+K-2)/K;
+                //second rightmost child is par*K
+            }
+            else{
+                ans++;
+                b = (b+K-2)/K;
+            }
+        }
+        print(ans);
+    }
+    
+    return 0;
+}
+/*
+ * K = 1, trivial
+ * otherwise, logk time
+ *
+ * find earliest split time
+ *
+ * (leftmost +1)/ k to get prev node val
+ */

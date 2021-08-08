@@ -1,0 +1,3 @@
+#include <iostream>
+#define sc(x) do{while((x=getchar())<'0'); for(x-='0'; '0'<=(_=getchar()); x=(x<<3)+(x<<1)+_-'0');}while(0)
+char _,buf[11];int psa[500001],N,Q,a,b,n,i;int main(){sc(N);sc(Q);for(i = 1; i <= N; i++){sc(psa[i]);psa[i]+=psa[i-1];}while(Q--){sc(a);sc(b);if(n=psa[N]-psa[b]+psa[a-1]){buf[10]='\n';i=9;while(n){buf[i--]=n%10+'0';n/=10;}while(buf[i]!='\n')putchar_unlocked(buf[++i]);}else{putchar_unlocked('0');putchar_unlocked('\n');}}}

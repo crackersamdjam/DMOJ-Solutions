@@ -1,0 +1,1 @@
+bool f(int n){while(1){if((n&7)==7)return 0;if(n&3)return 1;n/=4;}}
