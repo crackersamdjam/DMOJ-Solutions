@@ -1,3 +1,4 @@
 # DMOJ-Solutions
 
-AC (correct) solutions to problems on https://dmoj.ca/.
+My AC (passing) solutions to problems on https://dmoj.ca/.
+
